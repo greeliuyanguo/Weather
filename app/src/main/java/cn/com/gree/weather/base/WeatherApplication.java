@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 
+import org.litepal.LitePal;
+
 import java.util.List;
 
 /**
@@ -22,6 +24,11 @@ public class WeatherApplication extends Application {
         super.onCreate();
 
         initContext();
+        initLitePal();
+    }
+
+    private void initLitePal() {
+        LitePal.initialize(sContext);
     }
 
     private void initContext() {

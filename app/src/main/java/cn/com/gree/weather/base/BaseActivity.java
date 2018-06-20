@@ -92,6 +92,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private void initToolbar() {
         mToolbar = findViewById(R.id.toolbar);
+        if (null == mToolbar) {
+            return;
+        }
         mToolbarTitle = mToolbar.findViewById(R.id.title_toolbar);
         mToolbarTitle.setText(getToolbarTitle());
         setSupportActionBar(mToolbar);
