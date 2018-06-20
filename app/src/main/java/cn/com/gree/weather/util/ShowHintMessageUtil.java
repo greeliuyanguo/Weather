@@ -2,7 +2,7 @@ package cn.com.gree.weather.util;
 
 import android.widget.Toast;
 
-import cn.com.gree.weather.Base.WeatherApplication;
+import cn.com.gree.weather.base.WeatherApplication;
 
 /**
  * Author:liuyanguo

@@ -1,4 +1,4 @@
-package cn.com.gree.weather.Base;
+package cn.com.gree.weather.base;
 
 import android.app.Activity;
 import android.content.Intent;

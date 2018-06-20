@@ -2,7 +2,7 @@ package cn.com.gree.weather;
 
 import android.os.Bundle;
 
-import cn.com.gree.weather.Base.BaseActivity;
+import cn.com.gree.weather.base.BaseActivity;
 
 public class MainActivity extends BaseActivity {
 

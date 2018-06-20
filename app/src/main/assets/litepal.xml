@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="weather" />
+    <version value="1" />
+    <list>
+        <mapping class="cn.com.gree.weather.db.Province" />
+        <mapping class="cn.com.gree.weather.db.City" />
+        <mapping class="cn.com.gree.weather.db.County" />
+    </list>
+</litepal>
