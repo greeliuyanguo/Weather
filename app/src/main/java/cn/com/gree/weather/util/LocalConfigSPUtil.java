@@ -13,7 +13,7 @@ import cn.com.gree.weather.base.WeatherApplication;
  */
 
 public class LocalConfigSPUtil {
-    private static final String TAG = "LocalConfigSPUtil";
+    private static final String TAG = LocalConfigSPUtil.class.getSimpleName();
     private static LocalConfigSPUtil mInstance = null;
     private SharedPreferences mShared;
 
