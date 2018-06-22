@@ -2,8 +2,10 @@ package cn.com.gree.weather.base;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private TextView mToolbarTitle;
+    private int mDefaultStatusBarColor;
 
     /**
      * 外部Activity启动本Activity
@@ -45,9 +48,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     private void setTranslucent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.statusBarColor));
+            defaultGreaterLollipop();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //获取windowphone下的decorView
             ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
@@ -65,6 +66,22 @@ public abstract class BaseActivity extends AppCompatActivity {
             rootView.setFitsSystemWindows(true);
             rootView.setClipToPadding(true);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void defaultGreaterLollipop() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().setStatusBarColor(getDefaultStatusBarColor());
+    }
+
+    /**
+     * 获取默认状态栏颜色
+     *
+     * @return
+     */
+    public int getDefaultStatusBarColor() {
+        return Color.TRANSPARENT;
     }
 
     /**

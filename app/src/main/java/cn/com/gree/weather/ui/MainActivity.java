@@ -1,7 +1,10 @@
 package cn.com.gree.weather.ui;
 
-import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.view.View;
 
 import cn.com.gree.weather.R;
 import cn.com.gree.weather.base.BaseActivity;
@@ -19,13 +22,21 @@ public class MainActivity extends BaseActivity {
         initConfig();
     }
 
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void defaultGreaterLollipop() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+    }
+
     /**
      * 初始化配置基本逻辑
      */
     private void initConfig() {
         if (null != LocalConfigSPUtil.getInstance().getStringData("weather", null)) {
-            Intent intent = new Intent(this, WeatherActivity.class);
-            startActivity(intent);
+            launch(this, WeatherActivity.class);
             finish();
         }
     }
