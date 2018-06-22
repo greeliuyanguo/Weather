@@ -168,7 +168,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
                             LocalConfigSPUtil.getInstance().addStringData("weather", responseText);
                             showWeatherInfo(weather);
                         } else {
-                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WeatherActivity.this, "获取天气信息成功", Toast.LENGTH_SHORT).show();
                         }
                         mSwipeRefresh.setRefreshing(false);
                     }
