@@ -4,10 +4,13 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -37,7 +40,9 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     private TextView mTvAqiText, mTvPm25Text, mTvComfortText, mTvCarWashText, mTvSportText;
     private LinearLayout mLlForecastLayout;
     private ImageView mIvBingPicImg;
-    private SwipeRefreshLayout mSwipeRefresh;
+    public SwipeRefreshLayout mSwipeRefresh;
+    public DrawerLayout mDrawerLayout;
+    private Button mNavButton;
     private String mWeatherId;
 
     private static final String APP_KEY = "4bf7b7f80b0647ac9fd83d3f06e58dc2";
@@ -77,6 +82,11 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         mLlForecastLayout = findViewById(R.id.forecast_layout);
         mIvBingPicImg = findViewById(R.id.bing_pic_img);
         mSwipeRefresh = findViewById(R.id.swipe_refresh);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mNavButton = findViewById(R.id.nav_button);
+
+//        mTvTitleCity.setOnClickListener(this);
+        mNavButton.setOnClickListener(this);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
     }
 
@@ -86,6 +96,9 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             case R.id.title_city:
                 launch(this, MainActivity.class);
                 finish();
+                break;
+            case R.id.nav_button:
+                mDrawerLayout.openDrawer(Gravity.START);
                 break;
             default:
                 break;
@@ -129,7 +142,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
      *
      * @param weatherId
      */
-    private void requestWeather(final String weatherId) {
+    public void requestWeather(final String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" +
                 weatherId + "&key=" + APP_KEY;
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
