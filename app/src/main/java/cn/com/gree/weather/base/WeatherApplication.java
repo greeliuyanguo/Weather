@@ -16,6 +16,7 @@ import java.util.List;
  */
 public class WeatherApplication extends Application {
 
+    public static final String APP_KEY = "4bf7b7f80b0647ac9fd83d3f06e58dc2";
     private static final String TAG = WeatherApplication.class.getSimpleName();
     private static Context sContext;
 

@@ -1,5 +1,6 @@
 package cn.com.gree.weather.ui;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,8 +24,10 @@ import java.io.IOException;
 
 import cn.com.gree.weather.R;
 import cn.com.gree.weather.base.BaseActivity;
+import cn.com.gree.weather.base.WeatherApplication;
 import cn.com.gree.weather.gson.Forecast;
 import cn.com.gree.weather.gson.Weather;
+import cn.com.gree.weather.service.AutoUpdateService;
 import cn.com.gree.weather.util.HttpUtil;
 import cn.com.gree.weather.util.LocalConfigSPUtil;
 import cn.com.gree.weather.util.Utility;
@@ -44,8 +47,6 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     public DrawerLayout mDrawerLayout;
     private Button mNavButton;
     private String mWeatherId;
-
-    private static final String APP_KEY = "4bf7b7f80b0647ac9fd83d3f06e58dc2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +145,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
      */
     public void requestWeather(final String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" +
-                weatherId + "&key=" + APP_KEY;
+                weatherId + "&key=" + WeatherApplication.APP_KEY;
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -243,6 +244,8 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         mTvCarWashText.setText(carWash);
         mTvSportText.setText(sport);
         mSvWeatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
     @Override
