@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +30,9 @@ import cn.com.gree.weather.gson.Weather;
 import cn.com.gree.weather.service.AutoUpdateService;
 import cn.com.gree.weather.util.HttpUtil;
 import cn.com.gree.weather.util.LocalConfigSPUtil;
+import cn.com.gree.weather.util.LogUtil;
+import cn.com.gree.weather.util.ShowHintMessageUtil;
+import cn.com.gree.weather.util.SystemUtil;
 import cn.com.gree.weather.util.Utility;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -48,12 +51,15 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     private Button mNavButton;
     private String mWeatherId;
 
+    private ChooseAreaFragment mChooseAreaFrgment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
         initViews();
+        initDrawerLayout();
         initData();
     }
 
@@ -91,6 +97,15 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
     }
 
+    private void initDrawerLayout() {
+        mChooseAreaFrgment = (ChooseAreaFragment) getSupportFragmentManager().findFragmentById(R.id.choose_area_fragment);
+        RelativeLayout titleLayout = mChooseAreaFrgment.getTitleLayout();
+        View childStatusView = titleLayout.getChildAt(0);
+        int systemStatusHeight = SystemUtil.getSystemStatusHeight();
+        childStatusView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, systemStatusHeight));
+        childStatusView.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -110,32 +125,25 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
      * 初始化数据
      */
     private void initData() {
-        String weatherString = LocalConfigSPUtil.getInstance().getStringData("weather", null);
-        if (!TextUtils.isEmpty(weatherString)) {
-            //有缓存时直接解析天气数据
-            Weather weather = Utility.handleWeatherResponse(weatherString);
-            mWeatherId = weather.basic.weatherId;
-            showWeatherInfo(weather);
-        } else {
-            //无缓存时去服务器查询天气
-            mWeatherId = getIntent().getStringExtra("weather_id");
-            mSvWeatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(mWeatherId);
-        }
+        mWeatherId = getIntent().getStringExtra("weather_id");
+        mSvWeatherLayout.setVisibility(View.INVISIBLE);
+        requestWeather(mWeatherId);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestWeather(mWeatherId);
+                long lastTime = LocalConfigSPUtil.getInstance().getLongData("last_time");
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastTime < 3000) {
+                    ShowHintMessageUtil.showToast("请勿频繁刷新数据，稍后再试");
+                    mSwipeRefresh.setRefreshing(false);
+                    return;
+                } else {
+                    LocalConfigSPUtil.getInstance().addLongData("last_time", currentTime);
+                    requestWeather(mWeatherId);
+                }
             }
         });
-        String bingPic = LocalConfigSPUtil.getInstance().getStringData("bing_pic", null);
-        if (null != bingPic) {
-            Glide.with(this)
-                    .load(bingPic)
-                    .into(mIvBingPicImg);
-        } else {
-            loadBingPic();
-        }
+        loadBingPic();
     }
 
     /**
@@ -144,8 +152,10 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
      * @param weatherId
      */
     public void requestWeather(final String weatherId) {
+        mWeatherId = weatherId;
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" +
-                weatherId + "&key=" + WeatherApplication.APP_KEY;
+                mWeatherId + "&key=" + WeatherApplication.APP_KEY;
+        LogUtil.d("requestUrl = " + weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -161,15 +171,17 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
+                LogUtil.d("responseText = " + responseText);
                 final Weather weather = Utility.handleWeatherResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (null != weather && "ok".equals(weather.status)) {
+                            LocalConfigSPUtil.getInstance().addLongData("last_time", System.currentTimeMillis());
                             LocalConfigSPUtil.getInstance().addStringData("weather", responseText);
                             showWeatherInfo(weather);
                         } else {
-                            Toast.makeText(WeatherActivity.this, "获取天气信息成功", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
                         mSwipeRefresh.setRefreshing(false);
                     }
@@ -244,6 +256,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         mTvCarWashText.setText(carWash);
         mTvSportText.setText(sport);
         mSvWeatherLayout.setVisibility(View.VISIBLE);
+        ShowHintMessageUtil.showToast("获取天气信息成功");
         Intent intent = new Intent(this, AutoUpdateService.class);
         startService(intent);
     }
@@ -251,5 +264,15 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     @Override
     public String getToolbarTitle() {
         return null;
+    }
+
+    @Override
+    public void activityCloseExitTransition() {
+        LogUtil.d(TAG, "该页面退出不需要动画效果...");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

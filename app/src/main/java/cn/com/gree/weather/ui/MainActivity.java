@@ -1,10 +1,6 @@
 package cn.com.gree.weather.ui;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.view.View;
 
 import cn.com.gree.weather.R;
 import cn.com.gree.weather.base.BaseActivity;
@@ -18,17 +14,12 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        initConfig();
+//        initConfig();
     }
 
     @Override
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void defaultGreaterLollipop() {
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
+    public int getDefaultStatusBarColor() {
+        return getResources().getColor(R.color.colorPrimary);
     }
 
     /**
@@ -47,7 +38,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void activityCloseExitTransition() {
-        LogUtil.d(TAG, "该页面退出不需要动画效果...");
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 
+import com.baidu.mapapi.SDKInitializer;
+
 import org.litepal.LitePal;
 
 import java.util.List;
@@ -26,14 +28,21 @@ public class WeatherApplication extends Application {
 
         initContext();
         initLitePal();
+        initBaiduMap();
+    }
+
+    private void initContext() {
+        sContext = getApplicationContext();
     }
 
     private void initLitePal() {
         LitePal.initialize(sContext);
     }
 
-    private void initContext() {
-        sContext = getApplicationContext();
+    private void initBaiduMap() {
+        //在使用SDK各组件之前初始化context信息，传入ApplicationContext
+        //注意该方法要再setContentView方法之前实现
+        SDKInitializer.initialize(this);
     }
 
     /**

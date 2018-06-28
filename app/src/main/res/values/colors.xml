@@ -9,6 +9,7 @@
     <color name="blue">#0000ff</color>
 
     <color name="statusBarColor">#000000</color>
+    <color name="dashColor">#cfcfcf</color>
 
     <color name="tabTextNormalColor">#dadada</color>
     <color name="tabTextSelectedColor">#ffffff</color>
